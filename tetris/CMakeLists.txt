@@ -1,15 +1,20 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Tablero LANGUAGES CXX)
+project(tetris LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(Tablero tablero.cpp
-    tablero.h)
+add_executable(tetris
+    main.cpp
+    tablero.h
+    tablero.cpp
+    piezas.h
+    piezas.cpp
+)
 
 include(GNUInstallDirs)
-install(TARGETS Tablero
+install(TARGETS tetris
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
