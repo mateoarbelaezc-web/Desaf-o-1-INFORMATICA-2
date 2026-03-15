@@ -1,5 +1,0 @@
-# ninja log v6
-2	248	7953167467766102	CMakeFiles/tetris.dir/main.cpp.obj	bb3d554fd50d7633
-9	269	7953167467933314	CMakeFiles/tetris.dir/piezas.cpp.obj	65586cff0ad2dce2
-6	309	7953167467933314	CMakeFiles/tetris.dir/tablero.cpp.obj	3043eb63d62ceffc
-309	402	7953167470935170	tetris.exe	46be3560b0b8dafe
