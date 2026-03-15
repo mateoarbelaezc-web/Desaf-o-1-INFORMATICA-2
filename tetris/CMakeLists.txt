@@ -11,6 +11,8 @@ add_executable(tetris
     tablero.cpp
     piezas.h
     piezas.cpp
+    colisiones.h
+    colisiones.cpp
 )
 
 include(GNUInstallDirs)
