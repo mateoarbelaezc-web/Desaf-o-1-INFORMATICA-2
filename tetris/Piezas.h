@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <ctime>
 #include "tablero.h"
 
 using namespace std;
@@ -56,9 +55,6 @@ extern int           filaPieza;
 // FUNCIONES DE LAS PIEZAS
 // ─────────────────────────────────────────────
 
-// Inicializa la semilla de aleatoriedad.
-// Debe llamarse UNA SOLA VEZ al inicio del programa.
-void inicializarAleatorio();
 
 // Genera una pieza aleatoria, carga sus bits
 // en piezaActual y la coloca en la parte superior

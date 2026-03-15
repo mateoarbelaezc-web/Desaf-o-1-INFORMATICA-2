@@ -1,9 +1,20 @@
-#include <iostream>
+#include "tablero.h"
+#include "piezas.h"
 
-using namespace std;
+int main() {
 
-int main()
-{
-    cout << "Hello World!" << endl;
+    // Inicializa el tablero
+    inicializarTablero();
+
+    // Genera una pieza y la muestra en el tablero
+    generarPieza();
+
+    // Imprime el tablero con la pieza asomando
+    cout << "\nTablero con pieza generada:" << endl;
+    imprimirTablero();
+
+    // Libera la memoria
+    liberarTablero();
+
     return 0;
 }
