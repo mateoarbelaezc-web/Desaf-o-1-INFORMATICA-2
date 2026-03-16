@@ -62,4 +62,11 @@ extern int           filaPieza;
 // fila visible
 void generarPieza();
 
+// Mueve la pieza una posición hacia abajo
+// Retorna 1 si pudo bajar, 0 si aterrizó
+int bajarPieza();
+
+// Fija la pieza en el tablero cuando aterriza
+void fijarPieza();
+
 #endif // PIEZAS_H

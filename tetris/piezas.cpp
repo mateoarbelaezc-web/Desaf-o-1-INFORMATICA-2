@@ -1,4 +1,5 @@
 #include "piezas.h"
+#include "colisiones.h"
 
 // ─────────────────────────────────────────────
 // DEFINICIÓN DE VARIABLES GLOBALES
@@ -7,6 +8,7 @@ unsigned char piezaActual[MAX_CAJA];
 unsigned int  tamanioCaja = 0;
 unsigned int  tipoPieza   = 0;
 int           colPieza    = 0;
+int           filaPieza   = 0;
 
 // ─────────────────────────────────────────────
 // DEFINICIÓN DE LAS 5 PIEZAS EN BITS
@@ -103,6 +105,7 @@ void generarPieza() {
     // la mitad del tamaño de la caja a la mitad
     // del ancho del tablero
     colPieza = (int)(anchoTablero / 2) - (int)(tamanioCaja / 2);
+    filaPieza = 0;
 
     // ── 4. Encontrar la última fila visible ────
     // Recorremos las filas de la pieza de abajo
@@ -137,5 +140,118 @@ void generarPieza() {
             if (piezaActual[ultimaFila] & mascara)
                 setCelda(colPieza + col, 0); // fila 0 = parte superior
         }
+    }
+}
+
+// ─────────────────────────────────────────────
+// FUNCIÓN: fijarPieza
+// Cuando la pieza no puede bajar más, copia
+// sus bits permanentemente al tablero usando
+// setCelda. Después la pieza deja de existir
+// como pieza activa y pasa a ser parte del tablero.
+// ─────────────────────────────────────────────
+void fijarPieza() {
+
+    // Recorremos cada fila de la caja de la pieza
+    for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
+
+        // Recorremos cada columna de la caja
+        for (unsigned int col = 0; col < tamanioCaja; col++) {
+
+            // Máscara para leer el bit de esta columna
+            unsigned char mascara = 0x80 >> col;
+
+            // Si el bit está en 1, marcamos esa celda
+            // en el tablero como ocupada permanentemente
+            if (piezaActual[fila] & mascara) {
+
+                // Calculamos la posición real en el tablero
+                int colReal  = colPieza  + (int)col;
+                int filaReal = filaPieza + (int)fila;
+
+                // Solo fijamos celdas que estén dentro
+                // del tablero (filaReal >= 0)
+                if (filaReal >= 0)
+                    setCelda((unsigned int)colReal, (unsigned int)filaReal);
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────
+// FUNCIÓN: bajarPieza
+// Intenta bajar la pieza una posición.
+//
+// ¿Cómo funciona?
+//   1. Borra la pieza de su posición actual en el tablero
+//   2. Verifica con colisionValida si puede bajar
+//   3. Si puede → incrementa filaPieza y dibuja la pieza
+//   4. Si no puede → fija la pieza, limpia filas
+//      completas y genera una pieza nueva
+//
+// Retorna:
+//   1 si la pieza bajó exitosamente
+//   0 si la pieza aterrizó y se generó una nueva
+// ─────────────────────────────────────────────
+int bajarPieza() {
+
+    // ── 1. Borrar la pieza del tablero ─────────
+    // Antes de mover limpiamos los bits de la pieza
+    // en su posición actual para no dejar rastro
+    for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
+        for (unsigned int col = 0; col < tamanioCaja; col++) {
+
+            unsigned char mascara = 0x80 >> col;
+
+            if (piezaActual[fila] & mascara) {
+                int colReal  = colPieza  + (int)col;
+                int filaReal = filaPieza + (int)fila;
+
+                if (filaReal >= 0)
+                    limpiarCelda((unsigned int)colReal, (unsigned int)filaReal);
+            }
+        }
+    }
+
+    // ── 2. Verificar si puede bajar ────────────
+    // colisionValida recibe la nueva posición hipotética
+    // filaPieza + 1 = una fila más abajo
+    if (colisionValida(colPieza, filaPieza + 1)) {
+
+        // ── 3. Bajar la pieza ──────────────────
+        // Incrementamos filaPieza para moverla abajo
+        filaPieza++;
+
+        // Dibujamos la pieza en su nueva posición
+        for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
+            for (unsigned int col = 0; col < tamanioCaja; col++) {
+
+                unsigned char mascara = 0x80 >> col;
+
+                if (piezaActual[fila] & mascara) {
+                    int colReal  = colPieza  + (int)col;
+                    int filaReal = filaPieza + (int)fila;
+
+                    if (filaReal >= 0)
+                        setCelda((unsigned int)colReal, (unsigned int)filaReal);
+                }
+            }
+        }
+
+        return 1; // la pieza bajó exitosamente
+
+    } else {
+
+        // ── 4. Fijar la pieza ──────────────────
+        // No pudo bajar, fijamos la pieza en el tablero
+        fijarPieza();
+
+        // Verificamos y eliminamos filas completas
+        limpiarFilasCompletas();
+
+        // Generamos una nueva pieza en la parte superior
+        generarPieza();
+
+        return 0; // la pieza aterrizó
     }
 }

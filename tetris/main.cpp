@@ -3,18 +3,19 @@
 
 int main() {
 
-    // Inicializa el tablero
     inicializarTablero();
-
-    // Genera una pieza y la muestra en el tablero
     generarPieza();
 
-    // Imprime el tablero con la pieza asomando
-    cout << "\nTablero con pieza generada:" << endl;
+    cout << "\nPieza generada:" << endl;
     imprimirTablero();
 
-    // Libera la memoria
-    liberarTablero();
+    // Bajamos la pieza varias veces para probar
+    for (int i = 0; i < 5; i++) {
+        bajarPieza();
+        cout << "\nDespues de bajar " << i + 1 << " vez:" << endl;
+        imprimirTablero();
+    }
 
+    liberarTablero();
     return 0;
 }
