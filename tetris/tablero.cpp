@@ -1,5 +1,5 @@
 #include "tablero.h"
-
+#include "comprobacion.h"
 // ─────────────────────────────────────────────
 // DEFINICIÓN DE LAS VARIABLES GLOBALES
 // Aquí es donde realmente existen y ocupan memoria.
@@ -20,27 +20,11 @@ unsigned int    bytesPorFila = 0;
 // ─────────────────────────────────────────────
 void inicializarTablero() {
 
-    // ── Pedir y validar ancho ──────────────────
-    // El do-while repite la pregunta hasta que el valor sea válido.
-    // Condición: ancho >= 8 Y sea múltiplo de 8 (ancho % 8 == 0)
-    do {
-        cout << "Ingrese el ancho del tablero (multiplo de 8, minimo 8): ";
-        cin  >> anchoTablero;
-
-        if (anchoTablero < 8 || anchoTablero % 8 != 0)
-            cout << "Ancho invalido. Debe ser multiplo de 8 y minimo 8." << endl;
-
-    } while (anchoTablero < 8 || anchoTablero % 8 != 0);
-
-    // ── Pedir y validar alto ───────────────────
-    do {
-        cout << "Ingrese el alto del tablero (minimo 8): ";
-        cin  >> altoTablero;
-
-        if (altoTablero < 8)
-            cout << "Alto invalido. Debe ser minimo 8." << endl;
-
-    } while (altoTablero < 8);
+    // ── Pedir y validar dimensiones ───────────
+    // Usamos pedirDimensiones de comprobacion.cpp
+    // que valida que altura sea minimo 8 y ancho
+    // sea multiplo de 8 y minimo 8
+    pedirDimensiones(altoTablero, anchoTablero);
 
     // ── Calcular bytes por fila ────────────────
     // Como cada byte tiene 8 bits y cada bit es una celda,
