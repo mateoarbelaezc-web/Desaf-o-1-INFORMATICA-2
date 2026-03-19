@@ -1,33 +1,60 @@
+#include <iostream>
+using namespace std;
+
 #include "tablero.h"
 #include "piezas.h"
 #include "colisiones.h"
-#include "comprobacion.h"
+#include "rotar.h"
 
 int main() {
-
-    // Inicializa el tablero
     inicializarTablero();
-
-    // Genera la primera pieza
     generarPieza();
 
-    cout << "\nTablero inicial:" << endl;
-    imprimirTablero();
-
-    // Solo probamos bajar con 's' y salir con 'q'
-    char accion;
+    char opcion;
     bool jugando = true;
 
+    cout << "=== TETRIS POR TURNOS ===" << endl;
+    cout << "Comandos: (i)zquierda, (d)erecha, (b)ajar, (s)alir" << endl;
+
     while (jugando) {
+        imprimirTablero();
+        cout << "Turno - Elige comando (i/d/b/s): ";
+        cin >> opcion;
 
-        cout << "Accion: [S]Bajar [Q]Salir: ";
-        cin >> accion;
+        switch(opcion) {
+        case 'i':
+            if (moverPieza(-1))
+                cout << "Moviste izquierda" << endl;
+            else
+                cout << "No puedes mover izquierda" << endl;
+            break;
 
-        if (accion == 's') {
-            bajarPieza();
-            imprimirTablero();
-        } else if (accion == 'q') {
+        case 'd':
+            if (moverPieza(1))
+                cout << "Moviste derecha" << endl;
+            else
+                cout << "No puedes mover derecha" << endl;
+            break;
+
+        case 'b':
+            if (bajarPieza())
+                cout << "Bajaste" << endl;
+            else
+                cout << "Nueva pieza generada" << endl;
+            break;
+
+        case 's':
             jugando = false;
+            cout << "Fin del juego" << endl;
+            break;
+
+        case 'r':
+            rotarPieza();
+            cout << "Rotaste la pieza" << endl;
+            break;
+
+        default:
+            cout << "Comando invalido" << endl;
         }
     }
 
