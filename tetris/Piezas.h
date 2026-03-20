@@ -23,7 +23,9 @@ extern int           filaPieza;
 // ─────────────────────────────────────────────
 void generarPieza();
 int bajarPieza();
-void fijarPieza();
 int moverPieza(int direccion);
+void borrarPiezaTablero();
+void dibujarPiezaTablero();
+extern bool gameOver;
 
 #endif // PIEZAS_H

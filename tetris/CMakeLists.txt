@@ -15,6 +15,8 @@ add_executable(tetris
     colisiones.cpp
     comprobacion.cpp
     comprobacion.h
+    rotar.h
+    rotar.cpp
 )
 
 include(GNUInstallDirs)

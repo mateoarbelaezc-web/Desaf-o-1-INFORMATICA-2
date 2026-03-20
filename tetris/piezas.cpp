@@ -1,12 +1,13 @@
 #include "piezas.h"
 #include "colisiones.h"
-#include "cstdlib"
+#include <cstdlib>
 
 unsigned char piezaActual[MAX_CAJA];
 unsigned int  tamanioCaja = 0;
 unsigned int  tipoPieza   = 0;
 int           colPieza    = 0;
 int           filaPieza   = 0;
+bool gameOver = false;
 
 const unsigned char formas[NUM_PIEZAS][MAX_CAJA] = {
     { 0x00, 0xF0, 0x00, 0x00 },
@@ -24,7 +25,7 @@ void generarPieza() {
     for (unsigned int i = 0; i < MAX_CAJA; i++)
         piezaActual[i] = formas[tipoPieza][i];
     colPieza = (int)(anchoTablero / 2) - (int)(tamanioCaja / 2);
-    filaPieza = 0;
+
     int ultimaFila = -1;
     for (int i = (int)tamanioCaja - 1; i >= 0; i--) {
         if (piezaActual[i] != 0) {
@@ -32,16 +33,62 @@ void generarPieza() {
             break;
         }
     }
-    if (ultimaFila >= 0) {
+    if (ultimaFila >= 0)
+        filaPieza = -ultimaFila;
+    else
+        filaPieza = 0;
+
+    if (!colisionValida(colPieza, filaPieza)) {
+        gameOver = true;
+        return; // no dibujamos la pieza
+    }
+
+    dibujarPiezaTablero();
+}
+
+int bajarPieza() {
+    borrarPiezaTablero();
+
+    if (colisionValida(colPieza, filaPieza + 1)) {
+        filaPieza++;
+        dibujarPiezaTablero();
+        return 1;
+    } else {
+        dibujarPiezaTablero();
+        limpiarFilasCompletas();
+        generarPieza();
+        return 0;
+    }
+}
+
+int moverPieza(int direccion) {
+    borrarPiezaTablero();
+
+    if (colisionValida(colPieza + direccion, filaPieza)) {
+        colPieza += direccion;
+        dibujarPiezaTablero();
+        return 1;
+    } else {
+        dibujarPiezaTablero();
+        return 0;
+    }
+}
+
+void borrarPiezaTablero() {
+    for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
         for (unsigned int col = 0; col < tamanioCaja; col++) {
             unsigned char mascara = 0x80 >> col;
-            if (piezaActual[ultimaFila] & mascara)
-                setCelda(colPieza + col, 0);
+            if (piezaActual[fila] & mascara) {
+                int colReal  = colPieza  + (int)col;
+                int filaReal = filaPieza + (int)fila;
+                if (filaReal >= 0)
+                    limpiarCelda((unsigned int)colReal, (unsigned int)filaReal);
+            }
         }
     }
 }
 
-void fijarPieza() {
+void dibujarPiezaTablero() {
     for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
         for (unsigned int col = 0; col < tamanioCaja; col++) {
             unsigned char mascara = 0x80 >> col;
@@ -52,83 +99,5 @@ void fijarPieza() {
                     setCelda((unsigned int)colReal, (unsigned int)filaReal);
             }
         }
-    }
-}
-
-int bajarPieza() {
-    for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
-        for (unsigned int col = 0; col < tamanioCaja; col++) {
-            unsigned char mascara = 0x80 >> col;
-            if (piezaActual[fila] & mascara) {
-                int colReal  = colPieza  + (int)col;
-                int filaReal = filaPieza + (int)fila;
-                if (filaReal >= 0)
-                    limpiarCelda((unsigned int)colReal, (unsigned int)filaReal);
-            }
-        }
-    }
-    if (colisionValida(colPieza, filaPieza + 1)) {
-        filaPieza++;
-        for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
-            for (unsigned int col = 0; col < tamanioCaja; col++) {
-                unsigned char mascara = 0x80 >> col;
-                if (piezaActual[fila] & mascara) {
-                    int colReal  = colPieza  + (int)col;
-                    int filaReal = filaPieza + (int)fila;
-                    if (filaReal >= 0)
-                        setCelda((unsigned int)colReal, (unsigned int)filaReal);
-                }
-            }
-        }
-        return 1;
-    } else {
-        fijarPieza();
-        limpiarFilasCompletas();
-        generarPieza();
-        return 0;
-    }
-}
-
-int moverPieza(int direccion) {
-    for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
-        for (unsigned int col = 0; col < tamanioCaja; col++) {
-            unsigned char mascara = 0x80 >> col;
-            if (piezaActual[fila] & mascara) {
-                int colReal  = colPieza + (int)col;
-                int filaReal = filaPieza + (int)fila;
-                if (filaReal >= 0)
-                    limpiarCelda((unsigned int)colReal, (unsigned int)filaReal);
-            }
-        }
-    }
-
-    if (colisionValida(colPieza + direccion, filaPieza)) {
-        colPieza += direccion;
-
-        for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
-            for (unsigned int col = 0; col < tamanioCaja; col++) {
-                unsigned char mascara = 0x80 >> col;
-                if (piezaActual[fila] & mascara) {
-                    int colReal  = colPieza + (int)col;
-                    int filaReal = filaPieza + (int)fila;
-                    if (filaReal >= 0)
-                        setCelda((unsigned int)colReal, (unsigned int)filaReal);
-                }
-            }
-        }
-        return 1;
-    } else {
-        for (unsigned int fila = 0; fila < tamanioCaja; fila++) {
-            for (unsigned int col = 0; col < tamanioCaja; col++) {
-                unsigned char mascara = 0x80 >> col;
-                if (piezaActual[fila] & mascara) {
-                    int colReal  = colPieza + (int)col;
-                    int filaReal = filaPieza + (int)fila;
-                    if (filaReal >= 0)
-                        setCelda((unsigned int)colReal, (unsigned int)filaReal);
-                }
-            }
-        }
-        return 0;
     }
 }
